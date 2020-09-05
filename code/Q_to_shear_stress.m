@@ -4,23 +4,27 @@
 % 3. Estimate shear stress from Qn
 
 
-
+%%
 
 % 1. load Q data
-data = load('./test/data.txt');
+% data = load('./test/data.txt');
+% metadata = load('./test/info.txt');
 
-% need to look into the original Excel to 
-% gets which column is which
+sample,PH_DA,PH_IA,normalisedtime,PA_AorticFlowLmin,PA_BranchFlowmLmin = importdata_excel('test/Phase_Average.xlsx')
 
-t = data(:,0);
-Q = data(:,3); % not really
+%%
+t = normalisedtime;
+Q = PA_AorticFlowLmin; % not really
+
+plot(t,Q)
+xlabel('t^*')
+
+plot(t,Q)
 
 % just for the test let's take some data from
 % the readme_pulsatile.m
 
-
-clf; clear all; clc;
-
+%%
 r=0.001; grid=64; timestep=28; 
 ru=1060; freq=1.0; mu=0.0035; 
 
