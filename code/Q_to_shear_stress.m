@@ -10,7 +10,7 @@
 % data = load('./test/data.txt');
 % metadata = load('./test/info.txt');
 
-sample,PH_DA,PH_IA,normalisedtime,PA_AorticFlowLmin,PA_BranchFlowmLmin = importdata_excel('test/Phase_Average.xlsx');
+[sample,PH_DA,PH_IA,normalisedtime,PA_AorticFlowLmin,PA_BranchFlowmLmin] = importdata_excel('test/Phase_Average.xlsx');
 
 %%
 t = normalisedtime;
