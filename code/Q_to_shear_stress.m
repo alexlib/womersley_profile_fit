@@ -10,25 +10,41 @@
 % data = load('./test/data.txt');
 % metadata = load('./test/info.txt');
 
-[sample,PH_DA,PH_IA,normalisedtime,PA_AorticFlowLmin,PA_BranchFlowmLmin] = importdata_excel('test/Phase_Average.xlsx');
+% run the reader 
+read_data_xlsx
 
 %%
-t = normalisedtime;
-Q = PA_AorticFlowLmin; % not really
+%% Allocate imported array to column variable names
+% Normalisedtime1 = data(:,1);
+% PA_Surgery_90_Aortic1 = data(:,2);
+% PA_Surgery_90_Branch1 = data(:,3);
 
-% we need to resample at fixed frequency
+t = Normalisedtime1;
+Q = PA_Surgery_90_Aortic1; % not really
 
-dt = diff(t(1:2));
-
-% remove nans (from excel import)
- 
+% cleaning
 ind = ~isnan(t);
-
 t = t(ind);
 Q = Q(ind);
 
-% plot(t,Q,'-o');
-% xlabel('t^*');
+% 90 RPM 1.5 Hz
+% 115RPM 1.9167 Hz
+% 135RPM 2.25 Hz
+T = 1/1.5; % we use normalized time and take BPM values (in Hz)
+
+
+% aortic diameter [mm]:	42
+% branch diameter [mm]	18
+
+a = 0.042; % (m) - radius
+
+% we need to resample at fixed frequency
+
+dt = diff(t(1:2))/1.5;
+
+% remove nans (from excel import)
+
+
 
 
 % just for the test let's take some data from
@@ -42,14 +58,16 @@ Q = Q(ind);
 
 % 2. Fourier decompose Q
 nf = 10; % we can take n frequencies
-T = 1; % we use normalized time
 
-[Q0,Qn,phi] = FourierSeries(Q,dt,nf,T);
+[Q0,Qn,pshi] = FourierSeries(Q,dt,nf,T);
+
+% plot(t,Q,'-o');
+% xlabel('t^*');
+
 
 %%
 % 3. Q to \tau
 
-a = 0.001; % (m) - radius
 % flow properties: density, dynamic and kinematic viscosity
 rho=1060; 
 mu=0.0035; 
@@ -102,3 +120,7 @@ subplot(2,2,1); plot(t,Q); xlabel('time (s)'); ylabel('Flow Rate (ml/s)'); title
 subplot(2,2,2); plot(t,Tau,t,Tau_steady); xlabel('time (s)'); ylabel('Wall Shear Stress (dyn/cm^2)');title(sprintf('set %g',nExp));
 subplot(2,2,3); plot(t,Pp); xlabel('time (s)'); ylabel('Pressure Gradient (dyn/cm^3)');title(sprintf('set %g',nExp));
 subplot(2,2,4); plot(t,u((ny+1)/2,:)); xlabel('time (s)'); ylabel('Centerline Velocity (cm/s)');title(sprintf('set %g',nExp));
+
+
+figure
+plot(t,Q/max(Q),'r-',t,Tau/max(Tau),'b--',t,Pp/max(Pp),'g-.');title('Observe phase')

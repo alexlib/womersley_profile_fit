@@ -87,6 +87,6 @@ MN=zeros(N,1);
 PHIN=zeros(N,1);
 for n=1:N
     MN(n)=sqrt(AN(n)^2+BN(n)^2);
-    PHIN(n)=angle(AN(n)+i*BN(n));
+    PHIN(n)=angle(AN(n)+1i*BN(n));
 end
 end
