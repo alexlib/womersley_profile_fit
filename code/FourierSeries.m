@@ -63,6 +63,15 @@ if nargin == 0
 end
 [p0,pn,phi] = FourierCoefficients2(p,dt,N,T);
 
+
+figure
+          tt=0:dt:T;
+          pt=p0;
+          for n=1:N
+              pt=pt+pn(n)*cos(2*pi*tt*n/T-phi(n));
+          end
+          plot (tt,pt,'-k')%,0:dt:T,p,'x')
+
 end
 
 function [A0,AN,BN] = FourierCoefficients(p,dt,N,T)

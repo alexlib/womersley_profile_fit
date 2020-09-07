@@ -1,7 +1,7 @@
 % Alex plan
 % 1. load Q data
-% 2. Fourier decompose it into Qn
-% 3. Estimate shear stress from Qn
+% 2. Fourier decompose it into KQ
+% 3. Estimate shear stress from KQ
 
 
 %%
@@ -11,6 +11,7 @@
 % metadata = load('./test/info.txt');
 
 % run the reader 
+clear all
 read_data_xlsx
 
 %%
@@ -20,7 +21,8 @@ read_data_xlsx
 % PA_Surgery_90_Branch1 = data(:,3);
 
 t = Normalisedtime1;
-Q = PA_Surgery_90_Aortic1; % not really
+Q = PA_Surgery_90_Aortic1;
+Q=Q/1000/60; % idit divided in 60000 to converge L/min to m^3/s
 
 % cleaning
 ind = ~isnan(t);
@@ -57,11 +59,12 @@ dt = diff(t(1:2))/1.5;
 
 
 % 2. Fourier decompose Q
-nf = 10; % we can take n frequencies
+nf = 15; % we can take n frequencies
 
-[Q0,Qn,pshi] = FourierSeries(Q,dt,nf,T);
+[KQ0,KQ,pshi] = FourierSeries(Q,dt,nf,T);
 
-% plot(t,Q,'-o');
+figure
+plot(t,Q,'-o');
 % xlabel('t^*');
 
 
@@ -81,8 +84,8 @@ w0 = 2*pi/T;			    % fundamental radian frequency
 alpha0 = a*sqrt(w0/nu);	    % Womersley parameter, fundamental frequency
 w = w0*[1:nf];			    % array of radian frequencies
 alpha = a*sqrt(w/nu);	    % array of Womersley parameters
-K = 0*Qn;					% initialize pressure gradient array
-Q = Q0*temp2;				% initialize flow rate array with DC flow component
+K = 0*KQ;					% initialize pressure gradient array
+Q = KQ0*temp2;				% initialize flow rate array with DC flow component
 Pp = -8*nu*Q/(pi*a^4);	% initialize pressure gradient array with DC component
 Tau_steady = -a*Pp/2;	% initialize wall shear stress array with DC component
 Tau = Tau_steady;
