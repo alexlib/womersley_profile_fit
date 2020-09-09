@@ -21,15 +21,21 @@ read_data_xlsx
 % PA_Surgery_90_Branch1 = data(:,3);
 
 t = Normalisedtime1;
-Q = PA_Surgery_90_Aortic1;
+% Q = PA_Surgery_90_Aortic1;
+
+
+Q = PA_Surgery_90_Branch1;
 Q=Q/1000/60; % idit divided in 60000 to converge L/min to m^3/s
 
 % cleaning
 ind = ~isnan(t);
 t = t(ind);
 Q = Q(ind);
+
+
 figure
 plot(t,Q,'-o');
+title('original')
 
 
 % 90 RPM 1.5 Hz
@@ -41,12 +47,16 @@ T = max(t);
 figure
 plot(t,Q,'-o');
 xlabel('t (sec)');
+title('scaled to physical units')
+
+nf = 10; % we can take n frequencies
 
 
 % aortic diameter [mm]:	42
 % branch diameter [mm]	18
 
-a = 0.042; % (m) - radius
+a = 0.042/2; % (m) - aorta radius
+a = 0.018/2; % (m) - branch radius
 
 % we need to resample at fixed frequency
 
@@ -67,13 +77,9 @@ dt = diff(t(1:2));
 
 
 % 2. Fourier decompose Q
-nf = 10; % we can take n frequencies
 
-[KQ0,KQ,pshi] = FourierSeries(Q,nf,t);
-
-figure
-plot(t,Q,'-o');
-% xlabel('t^*');
+% [KQ0,KQ,pshi] = FourierSeries(Q,nf,t);
+fourier_decomposition
 
 
 %%
