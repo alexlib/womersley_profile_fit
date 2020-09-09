@@ -28,11 +28,19 @@ Q=Q/1000/60; % idit divided in 60000 to converge L/min to m^3/s
 ind = ~isnan(t);
 t = t(ind);
 Q = Q(ind);
+figure
+plot(t,Q,'-o');
+
 
 % 90 RPM 1.5 Hz
 % 115RPM 1.9167 Hz
 % 135RPM 2.25 Hz
-T = 1/1.5; % we use normalized time and take BPM values (in Hz)
+% T = 1/1.5; % we use normalized time and take BPM values (in Hz)
+t = t/1.5; % we trust t for being 0-1 sec and normalize by BPM to get physical time
+T = max(t);
+figure
+plot(t,Q,'-o');
+xlabel('t (sec)');
 
 
 % aortic diameter [mm]:	42
@@ -42,7 +50,7 @@ a = 0.042; % (m) - radius
 
 % we need to resample at fixed frequency
 
-dt = diff(t(1:2))/1.5;
+dt = diff(t(1:2));
 
 % remove nans (from excel import)
 
@@ -59,9 +67,9 @@ dt = diff(t(1:2))/1.5;
 
 
 % 2. Fourier decompose Q
-nf = 15; % we can take n frequencies
+nf = 10; % we can take n frequencies
 
-[KQ0,KQ,pshi] = FourierSeries(Q,dt,nf,T);
+[KQ0,KQ,pshi] = FourierSeries(Q,nf,t);
 
 figure
 plot(t,Q,'-o');

@@ -1,4 +1,4 @@
-function [p0,pn,phi] = FourierSeries(p,dt,N,T)
+function [p0,pn,phi] = FourierSeries(p,N,t)
 %FourierSeries FourierSeries function to generate coeficients of Fourier series for a given discrete data. 
 %   [p0,pn,phi] = FourierSeries(p,dt,N,T) provides a constant p0 and two
 %   arrays pn and phi with length N within period of T. N is the number of
@@ -61,21 +61,25 @@ if nargin == 0
     end
     plot (tt,pt,'-k',0:dt:T-dt,p,'x')
 end
-[p0,pn,phi] = FourierCoefficients2(p,dt,N,T);
+
+T = max(t);
+dt = diff(t(1:2));
+
+[p0,pn,phi,t] = FourierCoefficients2(p,dt,N,T,t);
 
 
 figure
-          tt=0:dt:T;
-          pt=p0;
-          for n=1:N
-              pt=pt+pn(n)*cos(2*pi*tt*n/T-phi(n));
-          end
-          plot (tt,pt,'-k')%,0:dt:T,p,'x')
-
+pt=p0;
+for n=1:N
+    pt=pt+pn(n)*cos(2*pi*t*n/T-phi(n));
+end
+% keyboard
+plot (t,pt,'-k',t,p,'x')
+% keyboard
 end
 
-function [A0,AN,BN] = FourierCoefficients(p,dt,N,T)
-t=0:dt:T-dt;
+function [A0,AN,BN,t] = FourierCoefficients(p,dt,N,T,t)
+% t=0:dt:T-dt;
 A0=0;
 for n=1:length(p)
     A0=A0+p(n)*dt/T;
@@ -90,8 +94,8 @@ for n=1:N;
 end
 end
 
-function [A0,MN,PHIN] = FourierCoefficients2(p,dt,N,T)
-[A0,AN,BN] = FourierCoefficients(p,dt,N,T);
+function [A0,MN,PHIN,t] = FourierCoefficients2(p,dt,N,T,t)
+[A0,AN,BN,t] = FourierCoefficients(p,dt,N,T,t);
 MN=zeros(N,1);
 PHIN=zeros(N,1);
 for n=1:N
