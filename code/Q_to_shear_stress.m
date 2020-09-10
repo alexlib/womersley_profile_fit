@@ -4,7 +4,7 @@
 % 3. Estimate shear stress from KQ
 
 % run the reader
-clear all, close all
+clc, clear all, close all
 %%
 % general, global data
 nf = 10; % we can take n frequencies
@@ -71,24 +71,30 @@ clearvars raw cellVectors R;
 %% we have 8 datasets
 
 bpm = [90,135,90,115,135,90,115,135];
+index=0; %idit
+counter=0; %idit
 
-for col = [1,4,7,10,13,16,20,24] % columns in the Excel file
+for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
+    index=index+1; % idit added
     % 8 datasets, see above
-    for data_type = 1:2
+    for data_type = 1%:2
+        counter=counter+1;
         % 1 is Aorta, 2 is branch
         if data_type == 1
         % aortic diameter [mm]:	42
-        % branch diameter [mm]	18
-            a = 0.042; % (m) - aorta diameter
+        % branch diameter [mm]	8
+            a = 0.042/2; % (m) - aorta radius
+            Qcoef=0.001;
         elseif data_type == 2
-           a = 0.018; % (m) - branch diameter
+           a = 0.008/2; % (m) - branch radius
+           Qcoef=1e-6;
         end
         
         t = data(:,col); % the NormalizedTime
         Q = data(:,col + data_type); % or Aorta or Branch
 
 
-         Q=Q/1000/60; % idit divided in 60000 to converge L/min to m^3/s
+         Q=Q*Qcoef/60; % idit divided in 60000 to converge L/min to m^3/s
         
         
         
@@ -108,8 +114,10 @@ for col = [1,4,7,10,13,16,20,24] % columns in the Excel file
         % 135RPM 2.25 Hz
         % T = 1/1.5; % we use normalized time and take BPM values (in Hz)
         
-        freq = bpm(col)/60;
-        
+         freq = bpm(col)/60;
+          
+          
+          
         t = t/freq; % we trust t for being 0-1 sec and normalize by BPM to get physical time
         T = max(t);
         
@@ -155,7 +163,8 @@ for col = [1,4,7,10,13,16,20,24] % columns in the Excel file
 
         
         mean_u = mean(Qr)*100 /(6*(pi*a*a));% calculate mean velocity [cm/s]
-        Re = mean_u*(2*a)/nu;% calculate Reynolds number
+        mean_u = mean(Qr) /((pi*a*a))%;% idit changed to m/s  and deleted the 6       
+        Re = mean_u*(2*a)/nu%;% calculate Reynolds number
         
         y = (-1: 2/(ny-1): 1)';				% column vector of y's
         u = (2*KQ0/(pi*a^2))*((1 - y.*y)*temp2);
@@ -178,23 +187,39 @@ for col = [1,4,7,10,13,16,20,24] % columns in the Excel file
         %%
         % nExp = 1;
         
-        figure;
-        % Plot time waveforms of flow, pressure gradient, wall shear stress, and centerline velocity
-        subplot(2,2,1); plot(t,Q,t,Qr); xlabel('time (s)'); ylabel('Flow Rate (ml/s)'); % title(sprintf('set %g',nExp));
-        subplot(2,2,2); plot(t,Tau,t,Tau_steady); xlabel('time (s)'); ylabel('Wall Shear Stress (dyn/cm^2)');% title(sprintf('set %g',nExp));
-        subplot(2,2,3); plot(t,Pp); xlabel('time (s)'); ylabel('Pressure Gradient (dyn/cm^3)');% title(sprintf('set %g',nExp));
-        subplot(2,2,4); plot(t,u((ny+1)/2,:)); xlabel('time (s)'); ylabel('Centerline Velocity (cm/s)');% title(sprintf('set %g',nExp));
         
+        %idit
+%         figure; 
+%         % Plot time waveforms of flow, pressure gradient, wall shear stress, and centerline velocity
+%         subplot(2,2,1); plot(t,Q,t,Qr); xlabel('time (s)'); ylabel('Flow Rate (ml/s)'); % title(sprintf('set %g',nExp));
+%         subplot(2,2,2); plot(t,Tau,t,Tau_steady); xlabel('time (s)'); ylabel('Wall Shear Stress (dyn/cm^2)');% title(sprintf('set %g',nExp));
+%         subplot(2,2,3); plot(t,Pp); xlabel('time (s)'); ylabel('Pressure Gradient (dyn/cm^3)');% title(sprintf('set %g',nExp));
+%         subplot(2,2,4); plot(t,u((ny+1)/2,:)); xlabel('time (s)'); ylabel('Centerline Velocity (cm/s)');% title(sprintf('set %g',nExp));
+%         
+%         
+%         figure
+%         plot(t,Qr/max(Qr),'r-',t,Tau/max(Tau),'b--',t,Pp/max(Pp),'g-.');title('Observe phase')
+%         
+%         figure
+%         hold on
+%         title(sprintf('Velocity profiles for \alpha = %f',alpha0));
+%         
+%         for j=1:size(u,2)
+%             plot(u(:,j))
+%         end
+          
+            
+ PI= (max(Q)-min(Q))/mean(Q);
+ minmax=abs(min(Tau)/max(Tau));
+%  Ppr=
+%  OSI=
+  %idit
+            
+        summ(counter,:)=[freq*60, alpha0, Re, PI, minmax]; %idit
         
-        figure
-        plot(t,Qr/max(Qr),'r-',t,Tau/max(Tau),'b--',t,Pp/max(Pp),'g-.');title('Observe phase')
-        
-        figure
-        hold on
-        title(sprintf('Velocity profiles for \alpha = %f',alpha0));
-        
-        for j=1:size(u,2)
-            plot(u(:,j))
-        end
+
+
+
     end
 end
+summ  %idit
