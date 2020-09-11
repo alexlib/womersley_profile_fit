@@ -13,7 +13,7 @@ rho=1060;
 mu=0.0035;
 nu = mu/rho;
 
-        ny = 101;		% # points in profile (over diameter)
+ny = 101;		% # points in profile (over diameter)
 
 % read_data_xlsx
 
@@ -34,33 +34,33 @@ data = reshape([raw{:}],size(raw));
 % Normalisedtime1 = data(:,1);
 % PA_Surgery_90_Aortic1 = data(:,2);
 % PA_Surgery_90_Branch1 = data(:,3);
-% 
-% 
+%
+%
 % Normalisedtime2 = data(:,4);
 % PA_Surgery_135_Aortic = data(:,5);
 % PA_Surgery_135_Branch = data(:,6);
-% 
+%
 % Normalisedtime3 = data(:,7);
 % PA_Hybrid_90_Aortic = data(:,8);
 % PA_Hybrid_90_Branch = data(:,9);
-% 
-% 
+%
+%
 % Normalisedtime4 = data(:,10);
 % PA_Hybrid_115_Aortic = data(:,11);
 % PA_Hybrid_115_Branch = data(:,12);
-% 
+%
 % Normalisedtime5 = data(:,13);
 % PA_Hybrid_135_Aortic = data(:,14);
 % PA_Hybrid_135_Branch = data(:,15);
-% 
+%
 % Normalisedtime6 = data(:,16);
 % PA_Chimney_90_Aortic = data(:,17);
 % PA_Chimney_90_Branch = data(:,18);
-% 
+%
 % Normalisedtime7 = data(:,20);
 % PA_Chimney_115_Aortic = data(:,21);
 % PA_Chimney_115_Branch = data(:,22);
-% 
+%
 % Normalisedtime8 = data(:,24);
 % PA_Chimney_135_Aortic = data(:,25);
 % PA_Chimney_135_Branch = data(:,26);
@@ -81,20 +81,20 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         counter=counter+1;
         % 1 is Aorta, 2 is branch
         if data_type == 1
-        % aortic diameter [mm]:	42
-        % branch diameter [mm]	8
+            % aortic diameter [mm]:	42
+            % branch diameter [mm]	8
             a = 0.042/2; % (m) - aorta radius
             Qcoef=0.001;
         elseif data_type == 2
-           a = 0.008/2; % (m) - branch radius
-           Qcoef=1e-6;
+            a = 0.008/2; % (m) - branch radius
+            Qcoef=1e-6;
         end
         
         t = data(:,col); % the NormalizedTime
         Q = data(:,col + data_type); % or Aorta or Branch
-
-
-         Q=Q*Qcoef/60; % idit divided in 60000 to converge L/min to m^3/s
+        
+        
+        Q=Q*Qcoef/60; % idit divided in 60000 to converge L/min to m^3/s
         
         
         
@@ -114,10 +114,10 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         % 135RPM 2.25 Hz
         % T = 1/1.5; % we use normalized time and take BPM values (in Hz)
         
-         freq = bpm(col)/60;
-          
-          
-          
+        freq = bpm(col)/60;
+        
+        
+        
         t = t/freq; % we trust t for being 0-1 sec and normalize by BPM to get physical time
         T = max(t);
         
@@ -127,7 +127,7 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         % xlabel('t (sec)');
         % title('scaled to physical units')
         
-
+        
         
         %% 2. Fourier decompose Q
         Qf = fft(Q);
@@ -140,7 +140,7 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         end
         %% 3. Q to \tau
         
-
+        
         
         % nt = length(t);
         temp2 = ones(1,nt);  % temp2 = temp2(1,:);
@@ -160,10 +160,10 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         j32 = j^1.5;
         
         
-
+        
         
         mean_u = mean(Qr)*100 /(6*(pi*a*a));% calculate mean velocity [cm/s]
-        mean_u = mean(Qr) /((pi*a*a))%;% idit changed to m/s  and deleted the 6       
+        mean_u = mean(Qr) /((pi*a*a))%;% idit changed to m/s  and deleted the 6
         Re = mean_u*(2*a)/nu%;% calculate Reynolds number
         
         y = (-1: 2/(ny-1): 1)';				% column vector of y's
@@ -189,37 +189,37 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         
         
         %idit
-%         figure; 
-%         % Plot time waveforms of flow, pressure gradient, wall shear stress, and centerline velocity
-%         subplot(2,2,1); plot(t,Q,t,Qr); xlabel('time (s)'); ylabel('Flow Rate (ml/s)'); % title(sprintf('set %g',nExp));
-%         subplot(2,2,2); plot(t,Tau,t,Tau_steady); xlabel('time (s)'); ylabel('Wall Shear Stress (dyn/cm^2)');% title(sprintf('set %g',nExp));
-%         subplot(2,2,3); plot(t,Pp); xlabel('time (s)'); ylabel('Pressure Gradient (dyn/cm^3)');% title(sprintf('set %g',nExp));
-%         subplot(2,2,4); plot(t,u((ny+1)/2,:)); xlabel('time (s)'); ylabel('Centerline Velocity (cm/s)');% title(sprintf('set %g',nExp));
-%         
-%         
-%         figure
-%         plot(t,Qr/max(Qr),'r-',t,Tau/max(Tau),'b--',t,Pp/max(Pp),'g-.');title('Observe phase')
-%         
-%         figure
-%         hold on
-%         title(sprintf('Velocity profiles for \alpha = %f',alpha0));
-%         
-%         for j=1:size(u,2)
-%             plot(u(:,j))
-%         end
-          
- keyboard           
- PI= (max(Q)-min(Q))/mean(Q);
- minmax=abs(min(Tau)/max(Tau));
-Ppr = length(t(Tau < 0))/length(t)*100; % percentage of negative shear stress
-OSI=0.5*(1-(trapz(t,Tau)/trapz(t,abs(Tau))));
-
-            
-        summ(counter,:)=[freq*60, alpha0, Re, PI, minmax]; %idit
+        %         figure;
+        %         % Plot time waveforms of flow, pressure gradient, wall shear stress, and centerline velocity
+        %         subplot(2,2,1); plot(t,Q,t,Qr); xlabel('time (s)'); ylabel('Flow Rate (ml/s)'); % title(sprintf('set %g',nExp));
+        %         subplot(2,2,2); plot(t,Tau,t,Tau_steady); xlabel('time (s)'); ylabel('Wall Shear Stress (dyn/cm^2)');% title(sprintf('set %g',nExp));
+        %         subplot(2,2,3); plot(t,Pp); xlabel('time (s)'); ylabel('Pressure Gradient (dyn/cm^3)');% title(sprintf('set %g',nExp));
+        %         subplot(2,2,4); plot(t,u((ny+1)/2,:)); xlabel('time (s)'); ylabel('Centerline Velocity (cm/s)');% title(sprintf('set %g',nExp));
+        %
+        %
+        %         figure
+        %         plot(t,Qr/max(Qr),'r-',t,Tau/max(Tau),'b--',t,Pp/max(Pp),'g-.');title('Observe phase')
+        %
+        %         figure
+        %         hold on
+        %         title(sprintf('Velocity profiles for \alpha = %f',alpha0));
+        %
+        %         for j=1:size(u,2)
+        %             plot(u(:,j))
+        %         end
         
-
-
-
+        
+        PI= (max(Q)-min(Q))/mean(Q);
+        minmax=abs(min(Tau)/max(Tau));
+        Ppr = length(t(Tau < 0))/length(t)*100; % percentage of negative shear stress
+        OSI=0.5*(1-(trapz(t,Tau)/trapz(t,abs(Tau))));
+        
+        
+        summ(counter,:)=[freq*60, alpha0, Re, PI, minmax, Ppr, OSI]; %idit
+        
+        
+        
+        
     end
 end
 summ  %idit
