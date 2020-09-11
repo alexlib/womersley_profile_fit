@@ -208,12 +208,12 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
 %             plot(u(:,j))
 %         end
           
-            
+ keyboard           
  PI= (max(Q)-min(Q))/mean(Q);
  minmax=abs(min(Tau)/max(Tau));
-%  Ppr=
-%  OSI=
-  %idit
+Ppr = length(t(Tau < 0))/length(t)*100; % percentage of negative shear stress
+OSI=0.5*(1-(trapz(t,Tau)/trapz(t,abs(Tau))));
+
             
         summ(counter,:)=[freq*60, alpha0, Re, PI, minmax]; %idit
         
