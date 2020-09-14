@@ -18,7 +18,8 @@ ny = 101;		% # points in profile (over diameter)
 % read_data_xlsx
 
 %% Import the data
-[~, ~, raw] = xlsread('test\data.xlsx','Sheet1','A2:AE249');
+% [~, ~, raw] = xlsread('test\data.xlsx','Sheet1','A2:AE249');
+[~, ~, raw] = xlsread('test\data2.xlsx','PhasAv','A2:AE249');
 raw(cellfun(@(x) ~isempty(x) && isnumeric(x) && isnan(x),raw)) = {''};
 cellVectors = raw(:,[4,8,12,16,20]);
 raw = raw(:,[1,2,3,5,6,7,9,10,11,13,14,15,17,18,19,21,22,23,24,25,26,27,28,29,30,31]);
@@ -71,13 +72,13 @@ clearvars raw cellVectors R;
 %% we have 8 datasets
 
 bpm = [90,135,90,115,135,90,115,135];
-index=0; %idit
-counter=0; %idit
+index=0; %idit, index=1 to 8
+counter=0; %idit, counter=1 to 16
 
-for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
+for col = [1,4,7,10,13,16,20,24] % columns in the Excel file
     index=index+1; % idit added
     % 8 datasets, see above
-    for data_type = 1%:2
+    for data_type = 1:2
         counter=counter+1;
         % 1 is Aorta, 2 is branch
         if data_type == 1
@@ -114,10 +115,8 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         % 135RPM 2.25 Hz
         % T = 1/1.5; % we use normalized time and take BPM values (in Hz)
         
-        freq = bpm(col)/60;
-        
-        
-        
+%         freq = bpm(col)/60;
+        freq = bpm(index)/60; % idit corrected
         t = t/freq; % we trust t for being 0-1 sec and normalize by BPM to get physical time
         T = max(t);
         
@@ -153,7 +152,7 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         
         K = 0*KQ;					% initialize pressure gradient array
         Qr = KQ0*temp2;				% initialize flow rate array with DC flow component
-        Pp = -8*nu*Qr/(pi*a^4);	% initialize pressure gradient array with DC component
+        Pp = -8*mu*Qr/(pi*a^4);	% initialize pressure gradient array with DC component
         Tau_steady = -a*Pp/2;	% initialize wall shear stress array with DC component
         Tau = Tau_steady;
         j = sqrt(-1);
@@ -163,8 +162,8 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         
         
         mean_u = mean(Qr)*100 /(6*(pi*a*a));% calculate mean velocity [cm/s]
-        mean_u = mean(Qr) /((pi*a*a))%;% idit changed to m/s  and deleted the 6
-        Re = mean_u*(2*a)/nu%;% calculate Reynolds number
+        mean_u = mean(Qr) /((pi*a*a));% idit changed to m/s  and deleted the 6
+        Re = mean_u*(2*a)/nu;% calculate Reynolds number
         
         y = (-1: 2/(ny-1): 1)';				% column vector of y's
         u = (2*KQ0/(pi*a^2))*((1 - y.*y)*temp2);
@@ -212,11 +211,11 @@ for col = [1]%,4,7,10,13,16,20,24] % columns in the Excel file
         PI= (max(Q)-min(Q))/mean(Q);
         minmax=abs(min(Tau)/max(Tau));
         Ppr = length(t(Tau < 0))/length(t)*100; % percentage of negative shear stress
-        OSI=0.5*(1-(trapz(t,Tau)/trapz(t,abs(Tau))));
+        OSI = 0.5*( 1 -  abs(trapz(t,Tau))/trapz(t,abs(Tau)) );
         
         
-        summ(counter,:)=[freq*60, alpha0, Re, PI, minmax, Ppr, OSI]; %idit
-        
+%         summ(counter,:)=[freq*60, alpha0, Re, PI, minmax, Ppr, OSI]; %idit
+         summ(counter,:)=[counter, freq*60,length(Tau), data_type,alpha0, Re/1000, PI, minmax, Ppr, OSI]; %idit
         
         
         
